@@ -1,0 +1,100 @@
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+const products = [
+  "Silk Vinyl",
+  "Vinylmatt",
+  "Weather Guard",
+  "Titebond",
+  "Acrylic Emulsion",
+  "Putty Premium",
+  "Putty Economy",
+  "Putty Prestige",
+  "Super Gloss",
+  "Prestige High Gloss",
+  "Wood Vanish",
+  "Roof Sealer",
+  "Thinner",
+  "White Spirit"
+];
+
+export default function SunmasterCatalogApp() {
+  const [customerName, setCustomerName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [order, setOrder] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleQuantityChange = (product, quantity) => {
+    setOrder({ ...order, [product]: quantity });
+  };
+
+  const handleSubmit = () => {
+    const orderMessage = `Hello SunmasterPaints,%0a%0aI'd like to place an order:%0a%0aName: ${customerName}%0aPhone: ${phoneNumber}%0a` +
+      Object.entries(order)
+        .filter(([_, qty]) => qty > 0)
+        .map(([product, qty]) => `- ${product}: ${qty}`)
+        .join("%0a");
+
+    const whatsappUrl = `https://wa.me/254768805473?text=${orderMessage}`;
+    window.open(whatsappUrl, "_blank");
+    setSubmitted(true);
+  };
+
+  return (
+    <div className="p-4 space-y-6 max-w-md mx-auto">
+      <h1 className="text-2xl font-bold text-center text-orange-600">SunmasterPaints</h1>
+      <p className="text-center">We don't just sell paint — we guide you!</p>
+
+      {!submitted ? (
+        <>
+          <Card>
+            <CardContent className="space-y-4 pt-4">
+              <h2 className="text-lg font-semibold">Customer Details</h2>
+              <Input
+                placeholder="Full Name"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
+              <Input
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="space-y-4 pt-4">
+              <h2 className="text-lg font-semibold">Select Paints</h2>
+              {products.map((product) => (
+                <div key={product} className="flex items-center justify-between">
+                  <label>{product}</label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="Qty"
+                    className="w-20"
+                    onChange={(e) => handleQuantityChange(product, e.target.value)}
+                  />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={handleSubmit}>
+            Submit Order via WhatsApp
+          </Button>
+        </>
+      ) : (
+        <Card>
+          <CardContent className="space-y-4 pt-4">
+            <h2 className="text-lg font-semibold text-green-600">Order Submitted</h2>
+            <p className="text-sm text-gray-500">Your order was sent to our WhatsApp line. We'll get in touch shortly!</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
